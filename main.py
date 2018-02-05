@@ -11,9 +11,18 @@ i2cport.writeto_mem(24, 0x20, bytearray([0x7F]))
 
 gyro = {'x_dir' : 0, 'y_dir' : 0, 'z_dir' : 0}
 
+ap_if = network.WLAN(network.AP_IF)
+ap_if.active(False) #disable access point
+
+sta_if = network.WLAN(network.STA_IF)
+sta_if.active(True)
+sta_if.connect('EEERover', 'exhibition')
+
+# ap_if.ifconfig() # access point data
+
+
 while(True):
     pin.on() #LED ON
-
 
     X_L = i2cport.readfrom_mem(24, 0x28, 1)
     X_H = i2cport.readfrom_mem(24, 0x29, 1)
@@ -21,6 +30,8 @@ while(True):
     Y_H = i2cport.readfrom_mem(24,0x2B, 1)
     Z_L = i2cport.readfrom_mem(24, 0x2C, 1)
     Z_H = i2cport.readfrom_mem(24,0x2D,1)
+    
+    print("Is connected ", sta_if.isconnected())
 
     x_comb = int.from_bytes(X_H,'big')
     y_comb = int.from_bytes(Y_H,'big')
