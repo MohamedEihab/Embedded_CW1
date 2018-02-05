@@ -3,6 +3,10 @@ import time
 import machine
 import network
 import ujson
+from umqtt.simple import MQTTClient
+
+
+
 
 pin = machine.Pin(2, machine.Pin.OUT) #Playing around with LEDs and machine pins
 
@@ -20,6 +24,13 @@ sta_if.connect('EEERover', 'exhibition')
 
 # ap_if.ifconfig() # access point data
 
+client = MQTTClient('Mohamed_Machine', '192.168.0.10')
+
+while(not sta_if.isconnected()):
+    time.sleep(0.1)
+
+if (sta_if.isconnected()):
+    client.connect()
 
 while(True):
     pin.on() #LED ON
@@ -43,7 +54,8 @@ while(True):
 
     #print('%d %d %d - TEST2'%(gyro['x_dir'],gyro['y_dir'],gyro['z_dir']))
     print(ujson.dumps(gyro))
-
+    #client.publish("TESTDATA", bytes(ujson.dumps(gyro)), 'utf-8')
+    client.publish(b"foo_topic", b"hello")
     time.sleep(0.2)
 
     pin.off() #LED OFF
