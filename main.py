@@ -7,13 +7,12 @@ SLAVE_ADDRESS = 0x39
 
 i2cport =I2C(scl=Pin(5), sda=Pin(4), freq=100000)
 i2cport.writeto_mem(SLAVE_ADDRESS, 0, b'\0x03')
-#i2cport.writeto(42, b'123')         # write 3 bytes to slave with 7-bit address 42
-
-#i2cport.writeto_mem(57, 0, b'\0x03')
 
 lux_sensor = {'channel_0': 0, 'channel_1' : 0}
+lux_input = [201]
+iterator = 0;
 
-def process_data():
+def process_input_data():
     data0low = int.from_bytes(i2cport.readfrom_mem(SLAVE_ADDRESS,0x8C,1),'big')
     data0high = int.from_bytes(i2cport.readfrom_mem(SLAVE_ADDRESS,0x8D,1),'big')
 
@@ -30,8 +29,17 @@ def process_data():
 
 while(True):
 #    pin.on() #LED ON
-    
-    process_data()
+    if (iterator >= 200):
+        for i in lux_input:
+            print(i)
+        iterator = 0;
+
+    iterator = iterator + 1;
+
+    process_input_data()
+
+    lux_input.append(lux_sensor['channel_0'])
+
 
     print(ujson.dumps(lux_sensor))
 
