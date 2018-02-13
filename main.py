@@ -1,5 +1,6 @@
 from machine import I2C, Pin
 import time
+import utime
 import machine
 import ujson
 import HeartRateProcessor
@@ -74,6 +75,6 @@ while(True):
     process_input_data()
     HeartRateClass.process_raw_lux(lux_sensor['channel_0'])
     #HeartRateProcessor.tick()
-    time.sleep(0.05) # 20 readings in a second
+    utime.sleep_ms(10) # 20 readings in a second
 
 #i2cport.writeto_mem(57, 0x00, bytearray([0x03]))
