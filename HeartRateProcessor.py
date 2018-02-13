@@ -1,11 +1,11 @@
-class HeartRateProcessorClass:
+class HeartRateProcessorClass: 
 	data = [None] * 200
 
 	average_impulse = 0;
 	current_impulse = 0;
 	previous_impulse = 0;
 
-	heart_rate = 1;
+	heart_rate = 1; #Average from like 3? for 12 second average.
 	heart_low = 0;
 	iterator = 0;
 	beats = 0 ;
@@ -20,7 +20,7 @@ class HeartRateProcessorClass:
 
 		sum_of_intensities = 0;
 		for x in range(0, 200):
-			print(x, self.data[x], self.average_impulse, self.below_average);
+			#print(x, self.data[x], self.average_impulse, self.below_average);
 			sum_of_intensities += self.data[x];
 			if (self.below_average == True):
 				if (self.data[x] - self.average_impulse > self.threshold): 

@@ -4,6 +4,7 @@ import utime
 import machine
 import ujson
 import HeartRateProcessor
+import PedometerClass
 
 # CONSTANTS
 SLAVE_ADDRESS = 0x39
@@ -12,6 +13,8 @@ i2cport_acc = I2C(scl = Pin(2), sda = Pin(16), freq = 100000)
 i2cport =I2C(scl=Pin(5), sda=Pin(4), freq=100000)
 
 HeartRateClass = HeartRateProcessor.HeartRateProcessorClass()
+PedometerInstance= PedometerClass.PedometerClass()
+
 
 i2cport.writeto_mem(SLAVE_ADDRESS, 0, b'\0x03')
 
@@ -74,6 +77,8 @@ def process_input_data():
 while(True):
     process_input_data()
     HeartRateClass.process_raw_lux(lux_sensor['channel_0'])
+    PedometerInstance.process_raw_data(gyro['x_dir'], gyro['y_dir'], gyro['z_dir'])
+    print(ujson.dumps(gyro))
     #HeartRateProcessor.tick()
     utime.sleep_ms(20) # 20 readings in a second
 
