@@ -1,7 +1,8 @@
 from machine import I2C, Pin
 import time
+import machine
 import ujson
-
+import HeartRateProcessor
 
 # CONSTANTS
 SLAVE_ADDRESS = 0x39
@@ -9,6 +10,7 @@ SLAVE_ADDRESS = 0x39
 i2cport_acc = I2C(scl = Pin(2), sda = Pin(16), freq = 100000)
 i2cport =I2C(scl=Pin(5), sda=Pin(4), freq=100000)
 
+HeartRateClass = HeartRateProcessor.HeartRateProcessorClass()
 
 i2cport.writeto_mem(SLAVE_ADDRESS, 0, b'\0x03')
 
@@ -16,6 +18,10 @@ i2cport.writeto_mem(SLAVE_ADDRESS, 0, b'\0x03')
 i2cport_acc.writeto_mem(24, 0x1F, b'\0xC0')
 i2cport_acc.writeto_mem(24, 0x23, b'\0x80')
 i2cport_acc.writeto_mem(24, 0x20, bytearray([0x7F]))
+
+#LED Pin
+
+LED_out = machine.Pin(15, machine.Pin.OUT)
 
 lux_sensor = {'channel_0': 0, 'channel_1' : 0}
 temp_sensor = {'temperature' : 0}
@@ -65,24 +71,9 @@ def process_input_data():
 
 
 while(True):
-#    pin.on() #LED ON
-    if (iterator >= 200):
-        for i in lux_input:
-            print(i)
-        iterator = 0;
-
-    iterator = iterator + 1;
-
     process_input_data()
-
-    lux_input.append(lux_sensor['channel_0'])
-
-    print(ujson.dumps(lux_sensor))
-    print(ujson.dumps(gyro))
-   # print(ujson.dumps(temp_sensor))
-
-    time.sleep(0.2)
-
-#    pin.off() #LED OFF
+    HeartRateClass.process_raw_lux(lux_sensor['channel_0'])
+    #HeartRateProcessor.tick()
+    time.sleep(0.05) # 20 readings in a second
 
 #i2cport.writeto_mem(57, 0x00, bytearray([0x03]))
