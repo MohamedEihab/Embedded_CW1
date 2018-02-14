@@ -5,9 +5,11 @@ import machine
 import ujson
 import HeartRateProcessor
 import PedometerClass
+import ustruct
 
 # CONSTANTS
 SLAVE_ADDRESS = 0x39
+TWOG = 16380
 
 i2cport_acc = I2C(scl = Pin(2), sda = Pin(16), freq = 100000)
 i2cport =I2C(scl=Pin(5), sda=Pin(4), freq=100000)
@@ -33,6 +35,16 @@ gyro = {'x_dir' : 0, 'y_dir' : 0, 'z_dir' : 0}
 
 lux_input = [201]
 iterator = 0;
+
+def to_signed(x):
+    xor_bits = 0xFFFF
+    if x>=0x7FFF:
+        y = x ^ xor_bits
+        y=0-(y+1)
+    else: 
+        y=x
+    return y
+
 
 def process_input_data():
 
@@ -63,13 +75,19 @@ def process_input_data():
     Z_L = i2cport_acc.readfrom_mem(24, 0x2C, 1)
     Z_H = i2cport_acc.readfrom_mem(24,0x2D,1)
 
-    x_comb = int.from_bytes(X_H,'big')
-    y_comb = int.from_bytes(Y_H,'big')
-    z_comb = int.from_bytes(Z_H,'big')
+    x_comb = int.from_bytes(X_H,'big')<<8
+    y_comb = int.from_bytes(Y_H,'big')<<8
+    z_comb = int.from_bytes(Z_H,'big')<<8
+    x_combf = float(to_signed(x_comb))
+    y_combf = float(to_signed(y_comb))
+    z_combf = float(to_signed(z_comb))
+    x_combf = x_combf*10/TWOG #Convert to m/s^2
+    y_combf = y_combf*10/TWOG
+    z_combf = z_combf*10/TWOG
 
-    gyro['x_dir'] = x_comb;
-    gyro['y_dir'] = y_comb;
-    gyro['z_dir'] = z_comb;
+    gyro['x_dir'] = x_combf;
+    gyro['y_dir'] = y_combf;
+    gyro['z_dir'] = z_combf;
 
     return;
 
@@ -77,9 +95,9 @@ def process_input_data():
 while(True):
     process_input_data()
     HeartRateClass.process_raw_lux(lux_sensor['channel_0'])
-    PedometerInstance.process_raw_data(gyro['x_dir'], gyro['y_dir'], gyro['z_dir'])
+    #PedometerInstance.process_raw_data(gyro['x_dir'], gyro['y_dir'], gyro['z_dir'])
     print(ujson.dumps(gyro))
     #HeartRateProcessor.tick()
-    utime.sleep_ms(20) # 20 readings in a second
+    utime.sleep_ms(200) # 20 readings in a second
 
 #i2cport.writeto_mem(57, 0x00, bytearray([0x03]))

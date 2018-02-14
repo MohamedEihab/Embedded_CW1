@@ -8,10 +8,10 @@ class PedometerClass:
 	iterator = 0;
 
 	def process_raw_data(self, x_in, y_in, z_in):
-		if (self.iterator >= 200):
+		if (self.iterator >= 100):
 			self.iterator = 0;
 
-			for x in range(0,200):
+			for x in range(0,100):
 				print(self.x_acc[x]);
 		else:
 			self.x_acc[self.iterator] = x_in;
