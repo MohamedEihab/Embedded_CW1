@@ -104,7 +104,7 @@ buffered_val = simulated_bpm
 
 HeartRateClass = HeartRateProcessor.HeartRateProcessorClass(delay, buffered_val)
 PedometerInstance= PedometerClass.PedometerClass()
-MQTTClientInstance = MQTTClientClass.MQTTClientClass()
+#MQTTClientInstance = MQTTClientClass.MQTTClientClass()
 
 while(True):
    # print(ujson.dumps(lux_sensor['channel_0']), ujson.dumps(lux_sensor['channel_1']))
@@ -114,7 +114,7 @@ while(True):
 
     broker_package['Steps_Taken'] = PedometerInstance.getSteps()
     broker_package['Heart_Rate'] = HeartRateClass.getHeartRate()
-    MQTTClientInstance.publish_data('topic/state', bytes(ujson.dumps(broker_package), 'utf-8'));
+    #MQTTClientInstance.publish_data('topic/state', bytes(ujson.dumps(broker_package), 'utf-8'));
    # print(bytes(ujson.dumps(broker_package), 'utf-8'))
    # print(ujson.dumps(broker_package))
     #PedometerInstance.process_raw_data(gyro['x_dir'], gyro['y_dir'], gyro['z_dir'])
