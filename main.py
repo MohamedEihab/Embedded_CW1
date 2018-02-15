@@ -5,7 +5,9 @@ import machine
 import ujson
 import HeartRateProcessor
 import PedometerClass
+import MQTTClientClass
 import ustruct
+
 
 # CONSTANTS
 SLAVE_ADDRESS = 0x39
@@ -14,8 +16,6 @@ TWOG = 16380
 i2cport_acc = I2C(scl = Pin(2), sda = Pin(16), freq = 100000)
 i2cport =I2C(scl=Pin(5), sda=Pin(4), freq=100000)
 
-HeartRateClass = HeartRateProcessor.HeartRateProcessorClass()
-PedometerInstance= PedometerClass.PedometerClass()
 
 
 i2cport.writeto_mem(SLAVE_ADDRESS, 0, b'\0x03')
@@ -35,6 +35,7 @@ gyro = {'x_dir' : 0, 'y_dir' : 0, 'z_dir' : 0}
 
 lux_input = [201]
 iterator = 0;
+
 
 def to_signed(x):
     xor_bits = 0xFFFF
@@ -91,13 +92,49 @@ def process_input_data():
 
     return;
 
+counter = 0;
+time = 0;
+delay = 20 #delay in ms
+simulated_bpm = 180
+duty_time = (60/simulated_bpm)/2
+duty_counter = duty_time / (delay/1000)
+led_switch = 0;
+buffered_val = simulated_bpm
+
+HeartRateClass = HeartRateProcessor.HeartRateProcessorClass(delay, buffered_val)
+PedometerInstance= PedometerClass.PedometerClass()
+#MQTTClientInstance = MQTTClientClass.MQTTClientClass()
 
 while(True):
+   # print(ujson.dumps(lux_sensor['channel_0']), ujson.dumps(lux_sensor['channel_1']))
     process_input_data()
-    HeartRateClass.process_raw_lux(lux_sensor['channel_0'])
+    HeartRateClass.process_raw_lux(lux_sensor['channel_1'])
+
+    #MQTTClientInstance.publish_data('topic/state', ujson.dumps(gyro));
+
     #PedometerInstance.process_raw_data(gyro['x_dir'], gyro['y_dir'], gyro['z_dir'])
-    print(ujson.dumps(gyro))
+    #print(ujson.dumps(gyro))
     #HeartRateProcessor.tick()
-    utime.sleep_ms(200) # 20 readings in a second
+
+    if (counter < duty_counter):
+        counter += 1;
+
+    else:
+        counter = 0;
+        if (led_switch == 0):
+            led_switch = 1;
+            LED_out.on()
+        else:
+            led_switch = 0;
+            LED_out.off()
+
+
+   # print(counter, duty_counter, duty_time, led_switch)
+    utime.sleep_ms(delay) # 20 readings in a second
+    time += delay
+
+
+
 
 #i2cport.writeto_mem(57, 0x00, bytearray([0x03]))
+
