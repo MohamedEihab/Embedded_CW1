@@ -17,10 +17,6 @@ class PedometerClass():
 			#	print("WALKING")
 			#if((self.z_acc[i-1] <0 and self.z_acc[i]>0) or (self.z_acc[i-1]>0 and self.z_acc[i]<0)):
 			#	print("WALKING")
-			else:
-				print("Lazy %d"%self.iterator)
-		else:
-			print("not yet.")
 	
 	def process_raw_data(self, x_in, y_in, z_in):
 		if (self.iterator >= 100):
