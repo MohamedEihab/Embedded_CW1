@@ -10,11 +10,12 @@ import ustruct
 # CONSTANTS
 SLAVE_ADDRESS = 0x39
 TWOG = 16380
+Stop = False
 
 i2cport_acc = I2C(scl = Pin(2), sda = Pin(16), freq = 100000)
 i2cport =I2C(scl=Pin(5), sda=Pin(4), freq=100000)
 
-HeartRateClass = HeartRateProcessor.HeartRateProcessorClass()
+#HeartRateClass = HeartRateProcessor.HeartRateProcessorClass()
 PedometerInstance= PedometerClass.PedometerClass()
 
 
@@ -23,7 +24,7 @@ i2cport.writeto_mem(SLAVE_ADDRESS, 0, b'\0x03')
 #temp setup
 i2cport_acc.writeto_mem(24, 0x1F, b'\0xC0')
 i2cport_acc.writeto_mem(24, 0x23, b'\0x80')
-i2cport_acc.writeto_mem(24, 0x20, bytearray([0x7F]))
+i2cport_acc.writeto_mem(24, 0x20, bytearray([0x4F]))
 
 #LED Pin
 
@@ -34,7 +35,7 @@ temp_sensor = {'temperature' : 0}
 gyro = {'x_dir' : 0, 'y_dir' : 0, 'z_dir' : 0}
 
 lux_input = [201]
-iterator = 0;
+iterator = 0
 
 def to_signed(x):
     xor_bits = 0xFFFF
@@ -65,7 +66,7 @@ def process_input_data():
   #  temp_low = int.from_bytes(i2cport_acc.readfrom_mem(24,0x0C,1),'big')
   #  temp_high = int.from_bytes(i2cport_acc.readfrom_mem(24,0x0D,1),'big')
 
-  #  temp_sensor['temperature'] = 256*temp_high + temp_low;
+  #  temp_sensor['temperature'] = 256*temp_high + temp_low
 
     #acceler data
     X_L = i2cport_acc.readfrom_mem(24, 0x28, 1)
@@ -85,19 +86,20 @@ def process_input_data():
     y_combf = y_combf*10/TWOG
     z_combf = z_combf*10/TWOG
 
-    gyro['x_dir'] = x_combf;
-    gyro['y_dir'] = y_combf;
-    gyro['z_dir'] = z_combf;
+    gyro['x_dir'] = x_combf
+    gyro['y_dir'] = y_combf
+    gyro['z_dir'] = z_combf
 
-    return;
+    return
 
 
-while(True):
+while(Stop!=True):
     process_input_data()
-    HeartRateClass.process_raw_lux(lux_sensor['channel_0'])
-    #PedometerInstance.process_raw_data(gyro['x_dir'], gyro['y_dir'], gyro['z_dir'])
+    #HeartRateClass.process_raw_lux(lux_sensor['channel_0'])
+    PedometerInstance.process_raw_data(gyro['x_dir'], gyro['y_dir'], gyro['z_dir'])
     print(ujson.dumps(gyro))
     #HeartRateProcessor.tick()
-    utime.sleep_ms(200) # 20 readings in a second
+    utime.sleep_ms(20) # 20 readings in a second
+    Stop = PedometerInstance.WalkTenSteps()
 
 #i2cport.writeto_mem(57, 0x00, bytearray([0x03]))
