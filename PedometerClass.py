@@ -11,23 +11,24 @@ class PedometerClass():
 		if(self.iterator!=0):
 			i = self.iterator
 			if((self.x_acc[i-1] <0 and self.x_acc[i]>0) or (self.x_acc[i-1]>0 and self.x_acc[i]<0)):
-				print("RUNNING %d"%self.walk )
+				#print("RUNNING %d"%self.walk )
+				#print("Steps Taken: ", self.walk)
 				self.walk = self.walk +1
 			#if((self.y_acc[i-1] <0 and self.y_acc[i]>0) or (self.y_acc[i-1]>0 and self.y_acc[i]<0)):
 			#	print("WALKING")
 			#if((self.z_acc[i-1] <0 and self.z_acc[i]>0) or (self.z_acc[i-1]>0 and self.z_acc[i]<0)):
 			#	print("WALKING")
-			else:
-				print("Lazy %d"%self.iterator)
-		else:
-			print("not yet.")
+			#else:
+				#print("Lazy %d"%self.iterator)
+		#else:
+			#print("not yet.")
 	
 	def process_raw_data(self, x_in, y_in, z_in):
 		if (self.iterator >= 100):
 			self.iterator = 0
 
-			for i in range(0,100):
-				print(self.x_acc[i])
+			#for i in range(0,100):
+				#print(self.x_acc[i])
 		else:
 			self.x_acc[self.iterator] = x_in
 			self.y_acc[self.iterator] = y_in
@@ -40,5 +41,7 @@ class PedometerClass():
 			return True
 		else:
 			return False	
-			
+	
+	def getSteps(self):
+		return self.walk;
 		

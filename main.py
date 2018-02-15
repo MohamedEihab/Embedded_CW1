@@ -94,7 +94,7 @@ def process_input_data():
 counter = 0;
 time = 0;
 delay = 20 #delay in ms
-simulated_bpm = 180
+simulated_bpm = 70
 duty_time = (60/simulated_bpm)/2
 duty_counter = duty_time / (delay/1000)
 led_switch = 0;
@@ -104,11 +104,11 @@ HeartRateClass = HeartRateProcessor.HeartRateProcessorClass(delay, buffered_val)
 PedometerInstance= PedometerClass.PedometerClass()
 #MQTTClientInstance = MQTTClientClass.MQTTClientClass()
 
-<<<<<<< HEAD
 while(True):
    # print(ujson.dumps(lux_sensor['channel_0']), ujson.dumps(lux_sensor['channel_1']))
     process_input_data()
     HeartRateClass.process_raw_lux(lux_sensor['channel_1'])
+    PedometerInstance.process_raw_data(gyro['x_dir'], gyro['y_dir'], gyro['z_dir'])
 
     #MQTTClientInstance.publish_data('topic/state', ujson.dumps(gyro));
 
@@ -133,7 +133,13 @@ while(True):
     utime.sleep_ms(delay) # 20 readings in a second
     time += delay
 
-    #PedometerInstance.process_raw_data(gyro['x_dir'], gyro['y_dir'], gyro['z_dir'])
+    if (time % 1000 == 0):
+        print("Steps Taken:", PedometerInstance.getSteps())
+
+        if (time % 5000 == 0):
+            print("Elapsed Time: ", time/1000)
+
+    #print(PedometerInstance.getSteps())
     #print(ujson.dumps(gyro))
     #HeartRateProcessor.tick()
     #utime.sleep_ms(20) # 20 readings in a second
