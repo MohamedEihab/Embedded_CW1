@@ -17,8 +17,8 @@ class MQTTClientClass:
 	#Server Credentials:
 
 	## EERover
-	# username = 'EEERover'
-	# password = 'exhibition'
+	#username = 'EEERover'
+	#password = 'exhibition'
 
 	## Mohamed's Phone
 	#username = 'Mohamed_Phone'
