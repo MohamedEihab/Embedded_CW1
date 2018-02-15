@@ -1,7 +1,8 @@
 class HeartRateProcessorClass: 
-	data = [None] * 200
-	heart_rate_array = [0] * 5
+    data = [None] * 200 # initialising array to hold intake of samples
+    heart_rate_array = [0] * 5 # initialising array to take heart rate readings
 
+    #initialising variables to be used in heart rate calculation
 	average_impulse = 0;
 	current_impulse = 0;
 	previous_impulse = 0;
@@ -14,73 +15,63 @@ class HeartRateProcessorClass:
 	heart_rate_iterator = 0;
 	beats = 0 ;
 	below_average = True;
-	threshold = 20;
+    threshold = 20; #threshold to signify change in rate constituting a heart beat
 	delay = None;
-	buffer_val = 0;
 
-	def __init__(self, _delay, buff):
+	def __init__(self, _delay):
 		self.delay = _delay;
-		self.buffer_val = buff;
 
+#function to calculate heart rate
 	def calculateHeartRate(self):
-		if (self.current_impulse < self.average_impulse):
+        if (self.current_impulse < self.average_impulse): #check if the most recent sample taken in is below average, signifying trough of a heart beat on ECG for example
 			self.below_average = True;
 		else:
 			self.below_average = False;
 
 		sum_of_intensities = 0;
-		for x in range(0, 200):
-
-			#print(self.current_impulse, self.iterator, self.average_impulse, self.average_impulse - self.current_impulse)
+        for x in range(0, 200): # loop through recently stored 200 samples of luminosity
 
 			sum_of_intensities += self.data[x];
+            # if the start / trough of a heartbeat is found then possibly increment heart beat count
 			if (self.below_average == True):
+                # if a luminoisty reading exceeeds average by larger than threshold, then increase heart beat count and set trough boolean value to false
 				if (self.data[x] - self.average_impulse > self.threshold): 
 					self.beats += 1;
 					self.below_average = False;
-					#print(x, self.data[x], self.average_impulse, self.below_average);
+					
 			else: #dont want to measure down beats, only up beats
 				if (self.average_impulse - self.data[x] > self.threshold):
 					self.below_average =  True
-			#if (self.data[x] > self.average_impulse):# and self.below_average == True):
-			#	print("x greater than average, and it was below average before")
-			#	self.beats += 1;
-			#	self.below_average = False;
-			#elif (self.data[x] < self.average_impulse):# and self.below_average == False):
-			#	print("x less than average, and it was greater than average before")
-			#	self.beats += 1;
-			#	self.below_average = True;
 
 
-		#print(self.average_impulse, self.beats, sum_of_intensities/200);
+
 		#beats in 4 seconds
 		per_second = 200/(1/self.delay)/1000
 		BPM = (self.beats/per_second)*60
-		#print(BPM, self.beats)
+		
 		average_BPM = 0;
 		sum_bpm = 0;
-
+        # populates average table if first time so as to not have table filled with 0s hence giving a low heart rate
 		if (self.heart_rate_iterator == 0):
 			self.heart_rate_iterator = 1;
 			for x in range(0, 5):
 				self.heart_rate_array[x] = BPM;
 
-		self.heart_rate_array[0] = self.buffer_val
-		self.heart_rate_array[1] = self.buffer_val
-		self.heart_rate_array[2] = self.buffer_val
-
+        #sum up values in array to calculate average and shift the values along the array, oldest value exits, new value entered in final array index
 		for x in range(0, 4):
-			#print(x, self.heart_rate_array[x])
+			
 			sum_bpm += self.heart_rate_array[x]
 			self.heart_rate_array[x] = self.heart_rate_array[x+1]
 		
-		#self.heart_rate_array[self.heart_rate_iterator] = BPM
+		
 		self.heart_rate_array[4] = BPM
 
-
+        #add new value to sum and calculate mean
 		sum_bpm += BPM
 		average_BPM = sum_bpm/5
-		#print("BPM: ", average_BPM, BPM , self.delay, sum_bpm, per_second)
+
+
+        # reset beats, print reading and assign in to output
 		print("BPM: ", average_BPM)
 		self.output_heart_rate = average_BPM;
 		self.beats = 0;
@@ -88,33 +79,25 @@ class HeartRateProcessorClass:
 	# takes in the raw luminosity reading
 	def process_raw_lux(self, input_lux):
 
+        # after collecting 200 samples, reset iterator and calculate heart rate using these 200 readings, then reset average impulse for new readings
 		if (self.iterator >= 200):
 			self.iterator = 0;
-			#self.new_data = [None] * 200
+			
 			self.calculateHeartRate();
-			#self.standard_average_impulse = self.average_impulse;
+			
 			self.average_impulse = 0;
-		#	self.data = self.new_data;
-		#else:
-		#if(self.iterator >=200):
-		#	print("IF")
-		#	self.iterator = 0
-		#	per_second = 200/(1/self.delay)/1000
-		#	print("BPM: ", (self.beats/per_second)*60, self.delay, per_second)
-		#	self.beats = 0
-
-			#self.previous_impulse = self.current_impulse;
+		
+        # if less than 200 collected so far, add sample to array, increment iterator and update average impulse taking new sample into account
 		else:
 			self.previous_impulse = self.current_impulse;
 			self.current_impulse = input_lux;
-			#if ((self.current_impulse - self.previous_impulse) > 500):
-			#	self.beats+=1;
-			#	print("ELSE")
+			
 
 
 			self.average_impulse = self.average_impulse + self.current_impulse/200
 			self.data[self.iterator] = input_lux;
 			self.iterator += 1;
 
+    # retrive heart rate
 	def getHeartRate(self):
 		return self.output_heart_rate;
