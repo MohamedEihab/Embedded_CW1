@@ -7,7 +7,7 @@ class HeartRateProcessorClass:
 	previous_impulse = 0;
 
 	#standard_average_impulse = 0;
-
+	output_heart_rate = 0;
 	heart_rate = 1; #Average from like 3? for 12 second average.
 	heart_low = 0;
 	iterator = 0;
@@ -82,6 +82,7 @@ class HeartRateProcessorClass:
 		average_BPM = sum_bpm/5
 		#print("BPM: ", average_BPM, BPM , self.delay, sum_bpm, per_second)
 		print("BPM: ", average_BPM)
+		self.output_heart_rate = average_BPM;
 		self.beats = 0;
 
 	# takes in the raw luminosity reading
@@ -115,3 +116,5 @@ class HeartRateProcessorClass:
 			self.data[self.iterator] = input_lux;
 			self.iterator += 1;
 
+	def getHeartRate(self):
+		return self.output_heart_rate;

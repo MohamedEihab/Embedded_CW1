@@ -12,7 +12,8 @@ class MQTTClientClass:
 	#Client Credentials:
 	client_name = 'Intelliband'
 	#client_ip = '192.168.0.10'
-	client_ip = '192.168.43.182'
+	#client_ip = '192.168.43.182' # Mohamed
+	client_ip = '192.168.43.167'
 	#Server Credentials:
 
 	## EERover
@@ -20,9 +21,12 @@ class MQTTClientClass:
 	# password = 'exhibition'
 
 	## Mohamed's Phone
-	username = 'Mohamed_Phone'
-	password = 'EEEGroup'
+	#username = 'Mohamed_Phone'
+	#password = 'EEEGroup'
 
+	## Shrey's Phone
+	username = 'AndroidAPS'
+	password = 'dvhb1337'
 
 	# Setting up the client class
 	def __init__(self):
