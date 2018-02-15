@@ -115,7 +115,7 @@ led_switch = 0; # Turns on the LED
 # Instances of the classes used 
 HeartRateClass = HeartRateProcessor.HeartRateProcessorClass(delay)
 PedometerInstance= PedometerClass.PedometerClass()
-MQTTClientInstance = MQTTClientClass.MQTTClientClass()
+#MQTTClientInstance = MQTTClientClass.MQTTClientClass()
 
 # The main loop for running the device
 while(True):
