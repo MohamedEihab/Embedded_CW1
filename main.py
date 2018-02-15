@@ -74,7 +74,7 @@ def process_input_data():
 
   #  temp_sensor['temperature'] = 256*temp_high + temp_low
 
-    # Accelerometer data
+    # Accelerometer data : read X Y Z from relevant registers in memory
     X_L = i2cport_acc.readfrom_mem(24, 0x28, 1)
     X_H = i2cport_acc.readfrom_mem(24, 0x29, 1)
     Y_L = i2cport_acc.readfrom_mem(24, 0x2A, 1)
@@ -82,17 +82,18 @@ def process_input_data():
     Z_L = i2cport_acc.readfrom_mem(24, 0x2C, 1)
     Z_H = i2cport_acc.readfrom_mem(24,0x2D,1)
 
-    # Converts data into integer
+    # Converts data into integer and shifts : low power mode is 8 bits 
+    #left aligned
     x_comb = int.from_bytes(X_H,'big')<<8
     y_comb = int.from_bytes(Y_H,'big')<<8
     z_comb = int.from_bytes(Z_H,'big')<<8
     
-    # Signs the data
+    # Converts from unsigned to signed int
     x_combf = float(to_signed(x_comb))
     y_combf = float(to_signed(y_comb))
     z_combf = float(to_signed(z_comb))
 
-    # Convert to m/s^2
+    # Convert to m/s^2 by dividing by 2g
     x_combf = x_combf*10/TWOG 
     y_combf = y_combf*10/TWOG
     z_combf = z_combf*10/TWOG
@@ -110,12 +111,12 @@ delay = 20 #delay in ms
 simulated_bpm = 70 # The simulated BPM for the LED
 duty_time = (60/simulated_bpm)/2 # How long the LED should be on and off for the simulated BPM
 duty_counter = duty_time / (delay/1000) # How many delays should we wait before flipping the LED
-led_switch = 0; # Turns on the LED 
+led_switch = 0 # Turns on the LED 
 
 # Instances of the classes used 
 HeartRateClass = HeartRateProcessor.HeartRateProcessorClass(delay)
 PedometerInstance= PedometerClass.PedometerClass()
-#MQTTClientInstance = MQTTClientClass.MQTTClientClass()
+MQTTClientInstance = MQTTClientClass.MQTTClientClass()
 
 # The main loop for running the device
 while(True):
@@ -131,15 +132,15 @@ while(True):
 
     # Duty counter for the LED
     if (counter < duty_counter):
-        counter += 1;
+        counter += 1
 
     else:
-        counter = 0;
+        counter = 0
         if (led_switch == 0):
-            led_switch = 1;
+            led_switch = 1
             LED_out.on() # Switches the LED on
         else:
-            led_switch = 0;
+            led_switch = 0
             LED_out.off() # Switches the LED off
 
 

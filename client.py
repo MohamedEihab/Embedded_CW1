@@ -8,10 +8,11 @@ heartRate = []
 timeTaken = []
 
 def plot(a, b, xaxis, yaxis):
+    plt.figure()
     plt.plot(a,b)
     plt.ylabel(yaxis)
     plt.xlabel(xaxis)
-    plt.show()
+
 
 def on_message(client, userdata, message):
     message_rec = str(message.payload.decode("utf-8"))
@@ -31,6 +32,7 @@ def on_message(client, userdata, message):
 
     stepsTaken.append(int(steps_taken))
     heartRate.append(int(heart_rate))
+    timeTaken.append(int(time.time() - startTime))
 
     #print("message topic=",message.topic)
     #return  "\'" + message_rec + "\'"
@@ -47,10 +49,13 @@ if(startTimeEn):
     startTimeEn = False
 client.subscribe("topic/state")
 (client.on_message)
-timeTaken.append(time.time() - startTime)
 
-time.sleep(10) # wait
+
+time.sleep(30) # wait
 client.loop_stop()
+if(len(heartRate)==len(stepsTaken) and len(heartRate)==len(timeTaken)):
+    plot(stepsTaken,heartRate, 'Steps Taken', 'Heart rate /bpm')
+    plot(timeTaken, stepsTaken, 'Time taken /s', 'Steps Taken')
+    plot(timeTaken, heartRate, 'Time Taken /s', 'Heart Rate /bpm')
+    plt.show()
 
-plot(stepsTaken,heartRate, 'Steps Taken', 'Heart rate /bpm')
-plot(timeTaken, stepsTaken, 'Time taken /s', 'Steps Taken')
